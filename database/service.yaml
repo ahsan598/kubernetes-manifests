@@ -1,0 +1,17 @@
+# Headless Service for MySQL
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-svc
+  namespace: dev
+  labels:
+    app: mysql-db
+spec:
+  clusterIP: None
+  selector:
+    app: mysql-db
+  ports:
+  - name: db-port
+    port: 3306
+    targetPort: mysql-port
+    protocol: TCP

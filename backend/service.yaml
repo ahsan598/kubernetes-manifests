@@ -1,0 +1,16 @@
+# ClusterIP Service for Node.js Backend Application
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: dev
+  labels:
+    app: node-app
+spec:
+  selector:
+    app: node-app
+  ports:
+  - name: http
+    port: 8080
+    targetPort: backend-port
+    protocol: TCP

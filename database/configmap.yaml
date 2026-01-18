@@ -1,0 +1,14 @@
+# MySQL Database Config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+  namespace: dev
+  labels:
+    app: mysql-db
+data:
+  MYSQL_DATABASE: mysqldb
+  MYSQL_USER: appuser
+  max_connections: "50"
+  innodb_buffer_pool_size: "512M"
+  query_cache_size: "128M"

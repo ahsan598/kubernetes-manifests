@@ -1,0 +1,97 @@
+# Deployment for Node.js Backend Application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deploy
+  namespace: dev
+  labels:
+    app: node-app
+
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+        allowPrivilegeEscalation: false
+
+      containers:
+      - name: node
+        image: myregistry/node-backend:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: backend-port
+          containerPort: 8080
+
+        volumeMounts:
+        - name: node-data
+          mountPath: /app/data
+          subPath: data
+
+        env:
+        - name: DB_HOST
+          value: "mysql-svc.dev.svc.cluster.local"
+        - name: DB_PORT
+          value: "3306"
+
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: MYSQL_DATABASE
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: MYSQL_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: MYSQL_PASSWORD
+
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "768Mi"
+            cpu: "500m"
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: backend-port
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: backend-port
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+      volumes:
+      - name: node-data
+        persistentVolumeClaim:
+          claimName: app-data

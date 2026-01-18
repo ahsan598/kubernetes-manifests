@@ -1,0 +1,14 @@
+# Persistent Volume Claim for Node.js Backend Application 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-data
+  namespace: dev
+spec:
+  storageClassName: efs
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 20Gi

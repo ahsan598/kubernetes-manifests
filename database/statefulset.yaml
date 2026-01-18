@@ -1,0 +1,92 @@
+# StatefulSet for MySQL Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: dev
+  labels:
+    app: mysql-db
+
+spec:
+  serviceName: mysql-svc
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+
+  selector:
+    matchLabels:
+      app: mysql-db
+  template:
+    metadata:
+      labels:
+        app: mysql-db
+
+    spec:
+      terminationGracePeriodSeconds: 90
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 999
+        runAsUser: 999
+        capabilities:
+          drop:
+          - ALL
+
+      containers:
+      - name: mysql
+        image: mysql:8.0.40
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: mysql-port
+          containerPort: 3306
+
+        envFrom:
+        - configMapRef:
+            name: db-config
+        - secretRef:
+            name: db-secret
+
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+          subPath: mysql
+
+        resources:
+          requests:
+            memory: "768Mi"
+            cpu: "500m"
+          limits:
+            memory: "1500Mi"
+            cpu: "1000m"
+
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "mysqladmin ping -u root -p$MYSQL_ROOT_PASSWORD"
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -h 127.0.0.1 -e "SELECT 1"
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: gp3
+      resources:
+        requests:
+          storage: 20Gi

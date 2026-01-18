@@ -1,0 +1,14 @@
+# StorageClass for Amazon EFS
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: efs
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-xxxxxxxx        # Replace with your EFS File System ID
+  directoryPerms: "755"
+  basePath: "/dynamic_provisioning"
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
