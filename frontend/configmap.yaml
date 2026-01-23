@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: frontend-config
+  name: nginx-config
   namespace: dev
   labels:
-    app: web-app
+    app: frontend
 data:
-  default.conf: |
+  nginx.conf: |
     server {
       listen 80;
       server_name _;
@@ -20,7 +20,7 @@ data:
       }
 
       location /api/ {
-        proxy_pass http://backend-svc.dev.svc.cluster.local:8080;
+        proxy_pass http://backend-svc.dev.svc.cluster.local:3000;
 
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -31,6 +31,10 @@ data:
         proxy_read_timeout 60s;
         proxy_send_timeout 60s;
         proxy_buffering off;
+      }
+
+      location /uploads {
+        proxy_pass http://backend-svc.dev.svc.cluster.local:3000/api/files;
       }
 
       location /health {
