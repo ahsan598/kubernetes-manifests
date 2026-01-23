@@ -1,4 +1,4 @@
-# Database Configuration
+# Database Config
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,6 +7,6 @@ metadata:
   labels:
     app: node-app
 data:
-  DB_HOST: "mysql-svc.dev.svc.cluster.local"
-  DB_PORT: "3306"
-  DB_NAME: "mysqldb"
+  host: "mysql-svc.dev.svc.cluster.local"
+  port: "3306"
+  dbname: "mysqldb"

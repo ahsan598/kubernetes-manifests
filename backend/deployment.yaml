@@ -44,11 +44,36 @@ spec:
           mountPath: /app/data
           subPath: data
 
-        envFrom:
-            - configMapRef:
+        env:
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
                 name: db-config
-            - secretRef:
+                key: host
+
+          - name: DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: db-config
+                key: port
+          
+          - name: DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: db-config
+                key: dbname
+
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
                 name: db-secret
+                key: user
+
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-secret
+                key: password
 
         resources:
           requests:
