@@ -5,7 +5,7 @@ metadata:
   name: backend-deploy
   namespace: dev
   labels:
-    app: node-app
+    app: backend
 
 spec:
   replicas: 3
@@ -17,11 +17,11 @@ spec:
 
   selector:
     matchLabels:
-      app: node-app
+      app: backend
   template:
     metadata:
       labels:
-        app: node-app
+        app: backend
 
     spec:
       securityContext:
@@ -32,48 +32,48 @@ spec:
         allowPrivilegeEscalation: false
 
       containers:
-      - name: node
-        image: myregistry/node-backend:v1.0.0
+      - name: backend-app
+        image: registry/backend:1.0
         imagePullPolicy: IfNotPresent
         ports:
         - name: backend-port
-          containerPort: 8080
-
-        volumeMounts:
-        - name: node-data
-          mountPath: /app/data
-          subPath: data
+          containerPort: 3000
 
         env:
           - name: DB_HOST
             valueFrom:
               configMapKeyRef:
-                name: db-config
-                key: host
+                name: backend-config
+                key: db-host
 
           - name: DB_PORT
             valueFrom:
               configMapKeyRef:
-                name: db-config
-                key: port
+                name: backend-config
+                key: db-port
           
           - name: DB_NAME
             valueFrom:
               configMapKeyRef:
-                name: db-config
-                key: dbname
+                name: backend-config
+                key: db-name
 
           - name: DB_USER
             valueFrom:
               secretKeyRef:
-                name: db-secret
+                name: backend-secret
                 key: user
 
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: db-secret
+                name: backend-secret
                 key: password
+          
+        volumeMounts:
+        - name: backend-data
+          mountPath: /app/uploads
+          subPath: data
 
         resources:
           requests:
@@ -101,6 +101,6 @@ spec:
           failureThreshold: 3
 
       volumes:
-      - name: node-data
+      - name: backend-data
         persistentVolumeClaim:
           claimName: app-data

@@ -2,11 +2,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: db-config
+  name: backend-config
   namespace: dev
   labels:
-    app: node-app
+    app: backend
 data:
-  host: "mysql-svc.dev.svc.cluster.local"
-  port: "3306"
-  dbname: "mysqldb"
+  db-host: "mysql-svc.dev.svc.cluster.local"
+  db-port: "3306"
+  db-name: "mysqldb"
+  path: "/app/uploads"
+  node-env: "dev"
+  port: "3000"

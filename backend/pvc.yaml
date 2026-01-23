@@ -5,7 +5,7 @@ metadata:
   name: app-data
   namespace: dev
 spec:
-  storageClassName: efs
+  storageClassName: efs-sc
   accessModes:
     - ReadWriteMany
   volumeMode: Filesystem

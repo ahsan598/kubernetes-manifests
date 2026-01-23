@@ -5,12 +5,12 @@ metadata:
   name: backend-svc
   namespace: dev
   labels:
-    app: node-app
+    app: backend
 spec:
   selector:
-    app: node-app
+    app: backend
   ports:
   - name: http
-    port: 8080
+    port: 3000
     targetPort: backend-port
     protocol: TCP
