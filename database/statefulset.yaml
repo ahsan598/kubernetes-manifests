@@ -54,10 +54,10 @@ spec:
 
         resources:
           requests:
-            memory: "768Mi"
+            memory: "1Gi"
             cpu: "500m"
           limits:
-            memory: "1500Mi"
+            memory: "2Gi"
             cpu: "1000m"
 
         livenessProbe:
@@ -85,7 +85,8 @@ spec:
   - metadata:
       name: mysql-data
     spec:
-      accessModes: ["ReadWriteOnce"]
+      accessModes: 
+      - ReadWriteOnce
       storageClassName: gp3
       resources:
         requests:
