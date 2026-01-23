@@ -50,15 +50,3 @@
 ### Configuration Management:
 - **Create ConfigMap:** `kubectl create configmap <configmap-name> --from-literal=<key>=<value>`
 - **Create Secret:** `kubectl create secret generic <secret-name> --from-literal=<key>=<value>`
-
----
-
-### Learning Resources – Tutorials & Guides
-- [Learn Docker](https://docker-curriculum.com/)
-- [Kube by Example](https://kubebyexample.com/)
-
-### Practice & Exam Simulators – Hands-on & Certification-Focused
-- [Killer.sh – Kubernetes Exam Simulators (CKA, CKAD, CKS)](https://killer.sh/)
-- [Roadmap.sh – DevOps & SRE Learning Roadmaps](https://roadmap.sh/)
-- [KodeKloud – Hands-on DevOps Labs](https://kodekloud.com)
-- [Play with Kubernetes](https://labs.play-with-k8s.com/)

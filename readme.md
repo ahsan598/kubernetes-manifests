@@ -25,8 +25,25 @@ This repository defines a complete Kubernetes stack consisting of:
 - Path based routing:
   - `/` → frontend
   - `/api` → backend
-  - `admin.example.com/api` → admin service
 
 **5. Storage**
 - MySQL → **gp3 (RWO)**
 - Application → **EFS (RWX shared)**
+
+
+---
+
+### Learning Resources
+- [Docker Curriculum](https://docker-curriculum.com/)
+- [Kube by Example](https://kubebyexample.com/)
+- [Roadmap – DevOps Learning Roadmaps](https://roadmap.sh/)
+- [KodeKloud – Hands-on DevOps Labs](https://kodekloud.com)
+- [Kubernetes Documentation](https://kubernetes.io/docs/home/)
+- [CNCF – Cloud-Native Ecosystem](https://www.cncf.io/)
+
+### Practice & Labs
+- [Killer Coda Browser-based scenarios](https://killercoda.com/)
+- [Play with Docker - Quick Docker practice](https://training.play-with-docker.com/)
+- [Play with Kubernetes - Live K8s clusters](https://labs.play-with-k8s.com/)
+- [Sad Servers - Real Linux production issues](https://sadservers.com/)
+- [OverTheWire - Linux + security fundamentals](https://overthewire.org/wargames/)
