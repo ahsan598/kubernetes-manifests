@@ -43,9 +43,9 @@ spec:
 
         envFrom:
         - configMapRef:
-            name: db-config
+            name: mysql-config
         - secretRef:
-            name: db-secret
+            name: mysql-secret
 
         volumeMounts:
         - name: mysql-data

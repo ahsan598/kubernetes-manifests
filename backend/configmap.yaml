@@ -1,0 +1,12 @@
+# Database Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+  namespace: dev
+  labels:
+    app: node-app
+data:
+  DB_HOST: "mysql-svc.dev.svc.cluster.local"
+  DB_PORT: "3306"
+  DB_NAME: "mysqldb"
