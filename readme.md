@@ -33,6 +33,10 @@ This repository defines a complete Kubernetes stack consisting of:
 
 ---
 
+### Commands
+- [Kubectl Quick Reference](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+- [Docker Commands](https://kubernetes.io/docs/reference/kubectl/docker-cli-to-kubectl/)
+
 ### Learning Resources
 - [Docker Curriculum](https://docker-curriculum.com/)
 - [Kube by Example](https://kubebyexample.com/)
