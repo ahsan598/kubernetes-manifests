@@ -1,8 +1,11 @@
+#=====================================================================
 # StatefulSet for MySQL Database
+# Provides stable identity and persistent storage for database pods
+#=====================================================================
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mysql
+  name: mysql-sts
   namespace: dev
   labels:
     app: mysql-db
@@ -10,48 +13,88 @@ metadata:
 spec:
   serviceName: mysql-svc
   replicas: 1
+  
+  # Ordered startup/shutdown
+  podManagementPolicy: OrderedReady
+  
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
       partition: 0
-
+  
   selector:
     matchLabels:
       app: mysql-db
+  
   template:
     metadata:
       labels:
         app: mysql-db
-
+    
     spec:
-      terminationGracePeriodSeconds: 90
+      terminationGracePeriodSeconds: 120
+      
+      # Pod-level security context
       securityContext:
         runAsNonRoot: true
-        fsGroup: 999
         runAsUser: 999
-        capabilities:
-          drop:
-          - ALL
-
+        fsGroup: 999
+        fsGroupChangePolicy: "OnRootMismatch"
+      
+      # Anti-affinity for high availability (multi-node distribution)
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - mysql-db
+              topologyKey: kubernetes.io/hostname
+      
       containers:
       - name: mysql
         image: mysql:8.0.40
         imagePullPolicy: IfNotPresent
+        
         ports:
-        - name: mysql-port
+        - name: mysql
           containerPort: 3306
-
+          protocol: TCP
+        
+        # Container-level security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - CHOWN
+            - SETUID
+            - SETGID
+            - FOWNER
+            - DAC_OVERRIDE
+        
         envFrom:
         - configMapRef:
             name: mysql-config
         - secretRef:
             name: mysql-secret
-
+        
         volumeMounts:
         - name: mysql-data
           mountPath: /var/lib/mysql
-          subPath: mysql
 
+        # MySQL runtime dirs need write access
+        - name: tmp
+          mountPath: /tmp
+        - name: run
+          mountPath: /var/run/mysqld
+        
         resources:
           requests:
             memory: "1Gi"
@@ -59,7 +102,20 @@ spec:
           limits:
             memory: "2Gi"
             cpu: "1000m"
-
+        
+        # Startup probe for initial DB initialization
+        startupProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "mysqladmin ping -u root -p$MYSQL_ROOT_PASSWORD"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        
+        # Liveness probe
         livenessProbe:
           exec:
             command:
@@ -70,22 +126,33 @@ spec:
           periodSeconds: 20
           timeoutSeconds: 5
           failureThreshold: 3
+        
+        # Readiness probe
         readinessProbe:
           exec:
             command:
             - sh
             - -c
-            - MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -h 127.0.0.1 -e "SELECT 1"
-          initialDelaySeconds: 15
+            - "MYSQL_PWD=\"$MYSQL_ROOT_PASSWORD\" mysql -h 127.0.0.1 -u root -e 'SELECT 1'"
+          initialDelaySeconds: 10
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
-
+      
+      # Ephemeral volumes for writable paths
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: run
+        emptyDir: {}
+  
   volumeClaimTemplates:
   - metadata:
       name: mysql-data
+      labels:
+        app: mysql-db
     spec:
-      accessModes: 
+      accessModes:
       - ReadWriteOnce
       storageClassName: gp3
       resources:

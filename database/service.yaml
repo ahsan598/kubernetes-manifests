@@ -1,4 +1,8 @@
-# Headless Service for MySQL
+#================================================
+# Headless Service for MySQL StatefulSet
+# Provides stable DNS identity per pod:
+# mysql-sts-0.mysql-svc.dev.svc.cluster.local
+#================================================
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,10 +12,14 @@ metadata:
     app: mysql-db
 spec:
   clusterIP: None
+
+  # Allows DNS records to exist even before pod is Ready
+  publishNotReadyAddresses: true
+
   selector:
     app: mysql-db
   ports:
   - name: db-port
     port: 3306
-    targetPort: mysql-port
+    targetPort: mysql
     protocol: TCP

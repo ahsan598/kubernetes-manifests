@@ -1,4 +1,7 @@
-# MySQL Database Config
+#=====================================
+# MySQL Database ConfigMap
+# Stores non-sensitive MySQL config
+#=====================================
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,5 +10,5 @@ metadata:
   labels:
     app: mysql-db
 data:
+  # Used by mysql container entrypoint only during first initialization
   MYSQL_DATABASE: "mysqldb"
-  max_connections: "50"

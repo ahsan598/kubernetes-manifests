@@ -1,4 +1,7 @@
+#=============================================================
 # StorageClass for AWS EBS gp3 volumes
+# Recommended for databases on EKS (EBS CSI driver required)
+#=============================================================
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -6,10 +9,24 @@ metadata:
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
+
+  # baseline performance settings
   iops: "3000"
   throughput: "125"
+
+  # at-rest encryption
   encrypted: "true"
+
+  # Filesystem type
   fsType: ext4
-reclaimPolicy: Retain
+
+# reclaimPolicy:
+# - Delete  : Delete EBS volume when PVC is deleted (no leftover storage cost)
+# - Retain  : Keep EBS volume even after PVC deletion (data preserved but may cost)
+reclaimPolicy: Delete
+
+# allow increasing PVC size later without downtime
 allowVolumeExpansion: true
+
+# ensures PV is created only after pod scheduled (AZ-aware provisioning)
 volumeBindingMode: WaitForFirstConsumer
