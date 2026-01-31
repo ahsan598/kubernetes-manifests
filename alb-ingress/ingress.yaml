@@ -1,4 +1,9 @@
-# Ingress configuration for ALB with multiple host and path routing
+#======================================================================
+# Ingress configuration for AWS ALB
+# Host + Path routing:
+#   myapp.example.com/api  --> backend-svc:3000
+#   myapp.example.com/     --> frontend-svc:80
+#======================================================================
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -8,10 +13,17 @@ metadata:
     # Core ALB settings
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+
+    # Explicitly define ALB listener ports
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
     
-    # SSL/TLS
+    # SSL/TLS & Redirect HTTP -> HTTPS
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:REGION:ACCOUNT:certificate/xxxx
     alb.ingress.kubernetes.io/ssl-redirect: "443"
+
+    # Health check configuration for backend
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+
 
 spec:
   ingressClassName: alb
