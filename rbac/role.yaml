@@ -1,10 +1,13 @@
+#=================================================
+# Role for Jenkins Pipeline to create resources
+#=================================================
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: jenkins-role
-  namespace: dev
+  namespace: webapps
 rules:
-  # Permissions for core API resources
+  # Core API resources
   - apiGroups: [""]
     resources:
       - secrets
@@ -14,20 +17,21 @@ rules:
       - pods
     verbs: ["get", "list", "watch", "create", "update", "delete","patch"]
 
-  # Permissions for apps API group
+  # Workloads
   - apiGroups: ["apps"]
     resources:
       - deployments
       - replicasets
+      - statefulsets
     verbs: ["get", "list", "watch", "create", "update", "delete","patch"]
 
-  # Permissions for networking API group
+  # Networking resources
   - apiGroups: ["networking.k8s.io"]
     resources:
       - ingresses
     verbs: ["get", "list", "watch", "create", "update", "delete","patch"]
 
-  # Permissions for autoscaling API group
+  # Autoscaling resources
   - apiGroups: ["autoscaling"]
     resources:
       - horizontalpodautoscalers
