@@ -17,7 +17,7 @@ This Role grants Jenkins permissions within the `webapps` namespace only, includ
    - pods, services, secrets, configmaps, PVC
 
    **b. Apps API Resources**
-   - deployments, replicasets
+   - deployments, replicasets, statefulsets
 
    **c. Networking & Autoscaling Resources**
    - ingress, HPA
@@ -26,19 +26,22 @@ This Role grants Jenkins permissions within the `webapps` namespace only, includ
 
 
 3. **RoleBinding**:
-This binds the jenkins Role → jenkins ServiceAccount in the same namespace:
-   - Ensures Jenkins can only manage resources inside webapps.
-   - Implements “least privilege” for namespace operations.
+This binds the **Jenkins Role → Jenkins ServiceAccount** in the same namespace:
+   - Ensures Jenkins can only manage resources inside `webapps` namespace.
+   - Implements “**least privilege**” for namespace operations.
 
 4. **ClusterRole (Cluster-Wide Permissions)**:
 These permissions are required for resources that exist at the cluster level, not within a namespace.
-Provides access to:
-   - persistentvolumes, storageclasses, clusterissuers
 
-   These are needed for:
-     - Dynamic volume provisioning
-     - Using AWS EBS StorageClass
-     - Managing Let's Encrypt ClusterIssuer (cert-manager)
+**Provides access to:**
+   - persistentvolumes
+   - storageclasses
+   - clusterissuers
+
+**These are needed for:**
+   - Dynamic volume provisioning
+   - Using AWS EBS StorageClass
+   - Managing Let's Encrypt ClusterIssuer (cert-manager)
 
 5. **ClusterRoleBinding**: This connects jenkins ServiceAccount → jenkins-cluster-role. Meaning Jenkins can work with cluster-scoped objects when needed.
 
@@ -57,6 +60,7 @@ Provides access to:
 2. Apply them in the following order:
    ```sh
    kubectl apply -f serviceaccount.yaml
+   Create token for serviceaccount
    kubectl apply -f role.yaml
    kubectl apply -f rolebinding.yaml
    kubectl apply -f clusterrole.yaml
@@ -74,8 +78,6 @@ Provides access to:
 
 
 ### 🎯 Summary
-
-With this RBAC setup:
 - Jenkins can fully deploy workloads into webapps namespace
 - Jenkins can manage Deployments, Services, HPA, Ingress, PVC, Secrets
 - Jenkins can work with StorageClasses + PVs
