@@ -1,4 +1,7 @@
-# StorageClass for Amazon EFS
+#====================================================================
+# StorageClass for AWS EFS volumes
+# Recommended for backend uploads on EKS (EFS CSI driver required)
+#====================================================================
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -7,10 +10,17 @@ provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
   fileSystemId: fs-xxxxxxxx        # Replace with your EFS File System ID
-  directoryPerms: "700"
+
+  basePath: "/uploads"
+
+  # Permissions for the EFS Access Point directory
+  # Use 770 for app shared read/write in group
+  directoryPerms: "770"
+
+  # Dynamic GID allocation range
   gidRangeStart: "1000"
   gidRangeEnd: "2000"
-  basePath: "/uploads"
-reclaimPolicy: Retain
+
+reclaimPolicy: Delete             # Deleting volume when PVC is deleted (no storage cost)
 volumeBindingMode: Immediate
 allowVolumeExpansion: true

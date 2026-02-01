@@ -1,4 +1,6 @@
-# Deployment for Node.js Backend Application
+#=====================================
+# Deployment for Backend Application
+#=====================================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,9 +8,9 @@ metadata:
   namespace: dev
   labels:
     app: backend
-
 spec:
   replicas: 3
+
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -18,6 +20,7 @@ spec:
   selector:
     matchLabels:
       app: backend
+
   template:
     metadata:
       labels:
@@ -29,78 +32,78 @@ spec:
         runAsUser: 1000
         runAsGroup: 3000
         fsGroup: 2000
-        allowPrivilegeEscalation: false
 
       containers:
-      - name: backend-app
-        image: registry/backend:1.0
-        imagePullPolicy: IfNotPresent
-        ports:
-        - name: backend-port
-          containerPort: 3000
+        - name: backend-app
+          image: registry/backend:1.0
+          imagePullPolicy: IfNotPresent
 
-        env:
-          - name: DB_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: db-host
+          securityContext:
+            allowPrivilegeEscalation: false
 
-          - name: DB_PORT
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: db-port
-          
-          - name: DB_NAME
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: db-name
+          ports:
+            - name: backend-port
+              containerPort: 3000
 
-          - name: DB_USER
-            valueFrom:
-              secretKeyRef:
-                name: backend-secret
-                key: user
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: db-host
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: db-port
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: db-name
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: password
 
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: backend-secret
-                key: password
-          
-        volumeMounts:
-        - name: backend-data
-          mountPath: /app/uploads
-          subPath: data
+          volumeMounts:
+            - name: backend-data
+              mountPath: /app/uploads
+              # subPath: data
 
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "768Mi"
-            cpu: "500m"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "768Mi"
+              cpu: "500m"
 
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: backend-port
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: backend-port
-          initialDelaySeconds: 15
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: backend-port
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: backend-port
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
 
       volumes:
-      - name: backend-data
-        persistentVolumeClaim:
-          claimName: app-data
+        - name: backend-data
+          persistentVolumeClaim:
+            claimName: app-data

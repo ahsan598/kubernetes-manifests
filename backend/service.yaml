@@ -1,4 +1,6 @@
-# ClusterIP Service for Node.js Backend Application
+#============================================
+# ClusterIP Service for Backend Application
+#============================================
 apiVersion: v1
 kind: Service
 metadata:

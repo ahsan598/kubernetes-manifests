@@ -1,4 +1,7 @@
-# Database Config
+#==================================================
+# Backend Database ConfigMap
+# Stores non-sensitive configs for MySQL connection
+#==================================================
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,9 +10,10 @@ metadata:
   labels:
     app: backend
 data:
-  db-host: "mysql-svc.dev.svc.cluster.local"
+  db-host: "mysql-svc"
   db-port: "3306"
   db-name: "mysqldb"
-  path: "/app/uploads"
+
+  upload-path: "/app/uploads"
   node-env: "dev"
   port: "3000"

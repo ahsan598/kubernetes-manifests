@@ -1,9 +1,15 @@
-# Persistent Volume Claim for Node.js Backend Application 
+#=========================================================================
+# PersistentVolumeClaim for Backend Application
+# Uses AWS EFS (RWX) for shared uploads/storage
+# Note: EFS is elastic; 20Gi is only a requested value, not a hard limit.
+#=========================================================================
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: app-data
   namespace: dev
+  labels:
+    app: backend
 spec:
   storageClassName: efs-sc
   accessModes:
