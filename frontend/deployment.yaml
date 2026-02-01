@@ -1,4 +1,6 @@
+#========================================
 # Deployment for Frontend Application
+#========================================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,9 +8,9 @@ metadata:
   namespace: dev
   labels:
     app: frontend
-
 spec:
   replicas: 3
+
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -18,6 +20,7 @@ spec:
   selector:
     matchLabels:
       app: frontend
+
   template:
     metadata:
       labels:
@@ -31,44 +34,51 @@ spec:
         fsGroup: 2000
 
       containers:
-      - name: nginx
-        image: registry/frontend:v1.0
-        imagePullPolicy: IfNotPresent
-        ports:
-        - name: frontend-port
-          containerPort: 80
+        - name: nginx
+          image: registry/frontend:v1.0
+          imagePullPolicy: IfNotPresent
 
-        volumeMounts:
-        - name: nginx-config
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
 
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "250m"
+          ports:
+            - name: frontend-port
+              containerPort: 80
 
-        livenessProbe:
-          httpGet:
-            path: /
-            port: frontend-port
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /
-            port: frontend-port
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: frontend-port
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: frontend-port
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
 
       volumes:
-      - name: nginx-config
-        configMap:
-          name: nginx-config
+        - name: nginx-config
+          configMap:
+            name: nginx-config

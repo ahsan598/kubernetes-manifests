@@ -1,14 +1,16 @@
-# Service for Frontend Application
+#============================================
+# ClusterIP Service for Frontend Application
+#============================================
 apiVersion: v1
 kind: Service
 metadata:
   name: frontend-svc
   namespace: dev
   labels:
-    app: web-app
+    app: frontend
 spec:
   selector:
-    app: web-app
+    app: frontend
   ports:
   - name: http
     port: 80
