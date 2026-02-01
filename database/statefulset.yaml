@@ -88,6 +88,7 @@ spec:
         volumeMounts:
         - name: mysql-data
           mountPath: /var/lib/mysql
+          # subPath: mysql
 
         # MySQL runtime dirs need write access
         - name: tmp
